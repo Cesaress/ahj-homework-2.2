@@ -1,38 +1,60 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  devServer: { port: 9000 },
-  entry: './src/index.js',
+  devServer: {
+    port: 8888,
+  },
+  devtool: 'source-map',
+  target: 'web',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'app.bundle.js',
+    publicPath: '',
   },
   module: {
     rules: [
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+      {
+        test: /\.html$/,
+        use: [
+          {
+            loader: 'html-loader',
+          },
+        ],
+      },
+      {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        use: [
+          MiniCssExtractPlugin.loader, 'css-loader',
+        ],
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        loader: 'file-loader',
-        options: {
-          name: 'img/[name].[ext]',
-        },
+        test: /\.svg$/,
+        type: 'asset/resource',
       },
       {
-        test: /\.ico$/,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]',
-        },
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              name: 'assets/[hash].[ext]',
+            }
+          }
+        ]
       },
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
+    new HtmlWebPackPlugin({
       template: './src/index.html',
       filename: './index.html',
     }),
